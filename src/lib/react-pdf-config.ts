@@ -9,7 +9,8 @@ import { pdfjs } from 'react-pdf';
 // 배포 환경에서도 작동하도록 Worker 경로 설정
 if (typeof window !== 'undefined') {
   // 프로덕션 빌드에서는 CDN 사용, 개발 환경에서는 로컬 파일 사용
-  if (import.meta.env.PROD) {
+  const isProd = (import.meta as any).env?.PROD ?? false;
+  if (isProd) {
     // 프로덕션: react-pdf가 사용하는 pdfjs-dist 버전에 맞는 CDN 사용
     pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
   } else {
@@ -30,7 +31,7 @@ if (typeof window !== 'undefined') {
   console.log('react-pdf Worker 설정 완료:', {
     workerSrc: pdfjs.GlobalWorkerOptions.workerSrc,
     pdfjsVersion: pdfjs.version,
-    environment: import.meta.env.PROD ? 'production' : 'development',
+    environment: isProd ? 'production' : 'development',
   });
 }
 

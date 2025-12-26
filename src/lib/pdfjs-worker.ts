@@ -8,7 +8,8 @@ import * as pdfjsLib from 'pdfjs-dist';
 // 배포 환경에서도 작동하도록 Worker 경로 설정
 if (typeof window !== 'undefined') {
   // 프로덕션 빌드에서는 CDN 사용, 개발 환경에서는 로컬 파일 사용
-  if (import.meta.env.PROD) {
+  const isProd = (import.meta as any).env?.PROD ?? false;
+  if (isProd) {
     // 프로덕션: CDN 사용 (배포 환경에서 안정적으로 작동)
     pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
   } else {
@@ -29,7 +30,7 @@ if (typeof window !== 'undefined') {
   console.log('PDF.js Worker 설정 완료:', {
     version: pdfjsLib.version,
     workerSrc: pdfjsLib.GlobalWorkerOptions.workerSrc,
-    environment: import.meta.env.PROD ? 'production' : 'development',
+    environment: isProd ? 'production' : 'development',
   });
 }
 
