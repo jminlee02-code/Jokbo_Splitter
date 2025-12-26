@@ -137,7 +137,7 @@ export default function PageGrid({ file, onPageToggle }: PageGridProps) {
             return (
               <motion.div
                 key={`page_${pageNumber}`}
-                onClick={() => onPageToggle(index)}
+                onClick={() => onPageToggle(pageIndex)}
                 className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
                   isSelected
                     ? 'border-[#0064FF] shadow-lg'

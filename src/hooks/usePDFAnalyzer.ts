@@ -18,13 +18,6 @@ export function usePDFAnalyzer(): UsePDFAnalyzerReturn {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * 텍스트 정규화: 한글만 남기기
-   * 로마자, 숫자, 공백, 특수문자를 모두 제거하고 오직 한글만 남김
-   */
-  const normalizeText = (text: string): string => {
-    return text.replace(/[^가-힣]/g, ''); // 한글을 제외한 모든 문자(공백 포함) 제거
-  };
 
   /**
    * 단일 PDF 파일을 분석합니다

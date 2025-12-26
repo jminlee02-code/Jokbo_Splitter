@@ -7,7 +7,7 @@ import Header from './components/Header';
 import FileUpload from './components/FileUpload';
 import SortableFileList from './components/SortableFileList';
 import OptionSelector from './components/OptionSelector';
-import { UploadedFile, ExtractionOptions, AnalyzedFile } from './types';
+import { UploadedFile, ExtractionOptions } from './types';
 import { ArrowRight } from 'lucide-react';
 import { usePDFAnalyzer } from './hooks/usePDFAnalyzer';
 import { validateForm } from './utils/validation';
@@ -23,7 +23,6 @@ function App() {
     문족: false,
   });
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  const [analyzedResults, setAnalyzedResults] = useState<AnalyzedFile[] | null>(null);
 
   const { analyzePDFs, isAnalyzing } = usePDFAnalyzer();
 
@@ -113,7 +112,6 @@ function App() {
       });
 
       // 결과 저장 및 콘솔 출력
-      setAnalyzedResults(results);
       console.log('=== PDF 분석 결과 ===');
       console.log('파일명:', fileName);
       console.log('선택된 옵션:', extractionOptions);
@@ -136,10 +134,7 @@ function App() {
 
       // IndexedDB에 데이터 저장 (대용량 파일 지원)
       const editorData = {
-        files: results.map((r) => ({
-          ...r,
-          currentSelectedIndices: [...r.selectedPageIndices], // 초기값은 분석 결과
-        })),
+        files: results,
         fileName,
       };
 
@@ -154,8 +149,9 @@ function App() {
         
         // IndexedDB가 실패해도 React Router state로 전달 (경고만 표시)
         console.log('IndexedDB 저장 실패, React Router state로 fallback');
-        toast.warning(`IndexedDB 저장 실패. 메모리 모드로 전환합니다. (${errorMessage})`, {
+        toast.error(`IndexedDB 저장 실패. 메모리 모드로 전환합니다. (${errorMessage})`, {
           duration: 3000,
+          icon: '⚠️',
         });
       }
       

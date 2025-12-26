@@ -3,6 +3,8 @@
  * 브라우저에 수백 MB ~ 수 GB까지 저장 가능
  */
 
+import { AnalyzedFile } from '@/types';
+
 interface EditorData {
   files: Array<{
     originalFile: {
@@ -15,6 +17,11 @@ interface EditorData {
     currentSelectedIndices: number[];
     totalPages: number;
   }>;
+  fileName: string;
+}
+
+interface EditorDataInput {
+  files: AnalyzedFile[];
   fileName: string;
 }
 
@@ -49,7 +56,7 @@ function initDB(): Promise<IDBDatabase> {
 /**
  * 편집기 데이터를 IndexedDB에 저장
  */
-export async function saveEditorData(data: EditorData): Promise<void> {
+export async function saveEditorData(data: EditorDataInput): Promise<void> {
   try {
     // 먼저 모든 파일을 ArrayBuffer로 변환 (트랜잭션 열기 전에)
     console.log('파일을 ArrayBuffer로 변환 중...');
@@ -61,13 +68,15 @@ export async function saveEditorData(data: EditorData): Promise<void> {
           // ArrayBuffer 복사본 생성 (transferable 방지)
           const bufferCopy = arrayBuffer.slice(0);
           return {
-            ...file,
             originalFile: {
               id: file.originalFile.id,
               name: file.originalFile.name,
               size: file.originalFile.size,
               arrayBuffer: bufferCopy,
             },
+            selectedPageIndices: file.selectedPageIndices,
+            currentSelectedIndices: file.selectedPageIndices,
+            totalPages: file.totalPages,
           };
         } catch (error) {
           console.error(`파일 ${file.originalFile.name} 변환 실패:`, error);
@@ -116,7 +125,7 @@ export async function saveEditorData(data: EditorData): Promise<void> {
       };
       
       transaction.onerror = (event) => {
-        const error = (event.target as Event)?.target;
+        const error = (event.target as IDBRequest)?.error || '알 수 없는 오류';
         console.error('트랜잭션 오류:', error);
         reject(new Error('트랜잭션 실패'));
       };

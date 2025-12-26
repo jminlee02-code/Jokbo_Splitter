@@ -7,7 +7,7 @@ import { EditorFile, AnalyzedFile } from '@/types';
 import FileSidebar from '@/components/editor/FileSidebar';
 import PageGrid from '@/components/editor/PageGrid';
 import { mergePDFs } from '@/lib/pdf-merger';
-import { loadEditorData, clearEditorData } from '@/lib/indexeddb';
+import { loadEditorData } from '@/lib/indexeddb';
 import '@/lib/react-pdf-config'; // Worker 설정 로드
 
 export default function Editor() {
@@ -183,7 +183,7 @@ export default function Editor() {
       
       // 다운로드
       const pdfBytes = await mergedPdf.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
