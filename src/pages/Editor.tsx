@@ -113,6 +113,7 @@ export default function Editor() {
         setLoadError(errorMessage);
         toast.error(`데이터를 불러오는데 실패했습니다: ${errorMessage}`, {
           duration: 5000,
+          icon: '❌', // 실제 오류이므로 X 표시 유지
         });
         setIsLoading(false);
         
@@ -128,6 +129,7 @@ export default function Editor() {
       setLoadError('편집할 데이터가 없습니다.');
       toast.error('편집할 데이터가 없습니다. 메인 페이지로 이동합니다.', {
         duration: 3000,
+        icon: '💡', // 사용자 안내이므로 전구 이모지 사용
       });
       setIsLoading(false);
       
@@ -162,7 +164,9 @@ export default function Editor() {
 
   const handleMergeAndDownload = async () => {
     if (files.length === 0) {
-      toast.error('병합할 파일이 없습니다.');
+      toast.error('병합할 파일이 없습니다.', {
+        icon: '💡', // 사용자 안내이므로 전구 이모지 사용
+      });
       return;
     }
 

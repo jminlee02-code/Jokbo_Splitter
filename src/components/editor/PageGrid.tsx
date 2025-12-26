@@ -75,10 +75,10 @@ export default function PageGrid({ file, onPageToggle }: PageGridProps) {
       <div className="flex justify-end">
         <motion.button
           onClick={() => setShowOnlySelected(!showOnlySelected)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium border ${
             showOnlySelected
-              ? 'bg-[#0064FF] text-white hover:bg-blue-600'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-white text-[#0064FF] border-[#0064FF] hover:bg-blue-50'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
           }`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}

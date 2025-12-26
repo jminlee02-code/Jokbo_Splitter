@@ -63,7 +63,7 @@ function App() {
 
     if (!validation.isValid) {
       setValidationErrors(validation.errors);
-      // 각 에러를 Toast로 표시
+      // 각 에러를 Toast로 표시 (사용자 안내는 덜 공격적인 아이콘 사용)
       validation.errors.forEach((error) => {
         toast.error(error, {
           style: {
@@ -73,7 +73,7 @@ function App() {
             padding: '12px 16px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
           },
-          icon: '❌',
+          icon: '💡', // 사용자 안내는 전구 이모지 사용
         });
       });
       return;
@@ -151,7 +151,7 @@ function App() {
         console.log('IndexedDB 저장 실패, React Router state로 fallback');
         toast.error(`IndexedDB 저장 실패. 메모리 모드로 전환합니다. (${errorMessage})`, {
           duration: 3000,
-          icon: '⚠️',
+          icon: '⚠️', // 경고이므로 경고 아이콘 유지
         });
       }
       
