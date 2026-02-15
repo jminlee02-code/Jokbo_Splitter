@@ -112,6 +112,21 @@ export default function SortableFileList({
     onFilesChange(sortedFiles);
   };
 
+  /** 파일명에서 교수님 성함 추출: 앞에서 3번째 언더바 뒤 = 4번째 세그먼트. 예) 날짜_0교시_수업명_ㅁㅁㅁ교수님_작성자_수정(0) */ 
+  const getProfessorFromFileName = (fileName: string): string => {
+    const parts = fileName.split('_');
+    return parts.length >= 4 ? parts[3].trim() : '';
+  };
+
+  const handleSortByProfessor = () => {
+    const sortedFiles = [...files].sort((a, b) => {
+      const profA = getProfessorFromFileName(a.name);
+      const profB = getProfessorFromFileName(b.name);
+      return profA.localeCompare(profB, 'ko', { sensitivity: 'base' });
+    });
+    onFilesChange(sortedFiles);
+  };
+
   if (files.length === 0) {
     return null;
   }
@@ -119,7 +134,7 @@ export default function SortableFileList({
   return (
     <div className="space-y-4">
       {/* 정렬 버튼 */}
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
         <motion.button
           onClick={handleSortByName}
           className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors text-sm font-medium"
@@ -127,7 +142,16 @@ export default function SortableFileList({
           whileTap={{ scale: 0.95 }}
         >
           <ArrowUpDown className="w-4 h-4" />
-          <span>파일명 순서대로 정렬</span>
+          <span>파일명 순</span>
+        </motion.button>
+        <motion.button
+          onClick={handleSortByProfessor}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors text-sm font-medium"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <ArrowUpDown className="w-4 h-4" />
+          <span>교수님 성함 순</span>
         </motion.button>
       </div>
 

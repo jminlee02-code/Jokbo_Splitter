@@ -15,7 +15,7 @@ export default function PageGrid({ file, onPageToggle }: PageGridProps) {
   const [numPages, setNumPages] = useState<number>(file.totalPages);
   const [loading, setLoading] = useState(true);
   const [showOnlySelected, setShowOnlySelected] = useState(false);
-  const pageWidth = 180; // 기본 크기 (200에서 180으로 줄임)
+  const pageWidth = 195; // 기본 크기 (180에서 195로 살짝 키움)
 
   // Document options를 useMemo로 메모이제이션 (경고 방지)
   const documentOptions = useMemo(
