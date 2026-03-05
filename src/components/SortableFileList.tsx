@@ -122,7 +122,14 @@ export default function SortableFileList({
     const sortedFiles = [...files].sort((a, b) => {
       const profA = getProfessorFromFileName(a.name);
       const profB = getProfessorFromFileName(b.name);
-      return profA.localeCompare(profB, 'ko', { sensitivity: 'base' });
+      const primary = profA.localeCompare(profB, 'ko', { sensitivity: 'base' });
+
+      // 같은 교수님일 경우 파일명 가나다순으로 정렬
+      if (primary === 0) {
+        return a.name.localeCompare(b.name, 'ko', { numeric: true, sensitivity: 'base' });
+      }
+
+      return primary;
     });
     onFilesChange(sortedFiles);
   };
