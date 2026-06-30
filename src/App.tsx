@@ -19,6 +19,7 @@ function App() {
   const [fileName, setFileName] = useState('');
   const [extractionOptions, setExtractionOptions] = useState<ExtractionOptions>({
     intro: false,
+    필족: false,
     급분바: false,
     문족: false,
   });

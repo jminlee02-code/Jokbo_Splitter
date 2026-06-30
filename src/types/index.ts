@@ -7,6 +7,7 @@ export interface UploadedFile {
 
 export interface ExtractionOptions {
   intro: boolean;
+  필족: boolean;
   급분바: boolean;
   문족: boolean;
 }

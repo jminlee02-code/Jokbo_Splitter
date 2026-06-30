@@ -23,7 +23,7 @@ export function validateForm(
   // 2. 추출 옵션 선택 여부
   const hasAnyOption = Object.values(options).some((v) => v);
   if (!hasAnyOption) {
-    errors.push('인트로, 급분바, 문족 중 최소 1개 이상의 옵션을 선택해주세요.');
+    errors.push('인트로, 필족, 급분바, 문족 중 최소 1개 이상의 옵션을 선택해주세요.');
   }
 
   // 3. 파일명 설정 여부

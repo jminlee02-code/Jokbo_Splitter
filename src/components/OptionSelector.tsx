@@ -20,6 +20,7 @@ export default function OptionSelector({
 
   const optionLabels = {
     intro: '인트로',
+    필족: '필족',
     급분바: '급분바',
     문족: '문족',
   };

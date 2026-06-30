@@ -8,14 +8,24 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 interface PageGridProps {
   file: EditorFile;
-  onPageToggle: (pageIndex: number) => void;
+  onPageToggle: (pageIndex: number, shiftKey?: boolean) => void;
 }
+
+type PageSize = 's' | 'm' | 'l';
+
+// 사이즈별 한 행 표시 개수에 맞춘 페이지 너비(px)와 그리드 컬럼 클래스
+const PAGE_SIZE_CONFIG: Record<PageSize, { width: number; gridClass: string }> = {
+  s: { width: 130, gridClass: 'grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6' },
+  m: { width: 195, gridClass: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' },
+  l: { width: 390, gridClass: 'grid-cols-1 md:grid-cols-2' },
+};
 
 export default function PageGrid({ file, onPageToggle }: PageGridProps) {
   const [numPages, setNumPages] = useState<number>(file.totalPages);
   const [loading, setLoading] = useState(true);
   const [showOnlySelected, setShowOnlySelected] = useState(false);
-  const pageWidth = 195; // 기본 크기 (180에서 195로 살짝 키움)
+  const [pageSize, setPageSize] = useState<PageSize>('m');
+  const { width: pageWidth, gridClass } = PAGE_SIZE_CONFIG[pageSize];
 
   // Document options를 useMemo로 메모이제이션 (경고 방지)
   const documentOptions = useMemo(
@@ -71,8 +81,24 @@ export default function PageGrid({ file, onPageToggle }: PageGridProps) {
         </p>
       </div>
 
-      {/* 필터 버튼 */}
-      <div className="flex justify-end">
+      {/* 필터 / 크기 버튼 */}
+      <div className="flex justify-end items-center gap-2">
+        {/* 페이지 크기 선택 */}
+        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+          {(['s', 'm', 'l'] as const).map((size) => (
+            <button
+              key={size}
+              onClick={() => setPageSize(size)}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                pageSize === size
+                  ? 'bg-white text-[#0064FF] shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {size.toUpperCase()}
+            </button>
+          ))}
+        </div>
         <motion.button
           onClick={() => setShowOnlySelected(!showOnlySelected)}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium border ${
@@ -123,7 +149,7 @@ export default function PageGrid({ file, onPageToggle }: PageGridProps) {
         options={documentOptions}
       >
         {/* 페이지 그리드 */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className={`grid ${gridClass} gap-4 select-none`}>
           {pagesToShow.length === 0 ? (
             <div className="col-span-full text-center py-12 text-gray-500">
               <p className="text-lg font-medium">선택된 페이지가 없습니다.</p>
@@ -137,7 +163,7 @@ export default function PageGrid({ file, onPageToggle }: PageGridProps) {
             return (
               <motion.div
                 key={`page_${pageNumber}`}
-                onClick={() => onPageToggle(pageIndex)}
+                onClick={(e) => onPageToggle(pageIndex, e.shiftKey)}
                 className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
                   isSelected
                     ? 'border-[#0064FF] shadow-lg'

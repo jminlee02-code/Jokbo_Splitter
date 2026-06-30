@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Toaster, toast } from 'react-hot-toast';
@@ -19,6 +19,12 @@ export default function Editor() {
   const [isMerging, setIsMerging] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  // Shift 범위 선택의 기준(앵커)이 되는 마지막 클릭 페이지. 파일을 바꾸면 초기화됨.
+  const lastClickedPageIndexRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    lastClickedPageIndexRef.current = null;
+  }, [currentFileIndex]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -141,23 +147,33 @@ export default function Editor() {
     loadData();
   }, [location.state, navigate]);
 
-  const handlePageToggle = (pageIndex: number) => {
+  const handlePageToggle = (pageIndex: number, shiftKey: boolean = false) => {
     if (files.length === 0) return;
 
     const updatedFiles = [...files];
     const currentFile = updatedFiles[currentFileIndex];
-    const selectedIndices = [...currentFile.currentSelectedIndices];
+    const selectedSet = new Set(currentFile.currentSelectedIndices);
 
-    const index = selectedIndices.indexOf(pageIndex);
-    if (index > -1) {
-      // 이미 선택되어 있으면 제거
-      selectedIndices.splice(index, 1);
+    const anchor = lastClickedPageIndexRef.current;
+
+    if (shiftKey && anchor !== null) {
+      // Shift 범위 선택: 마지막으로 클릭한 페이지부터 이번에 클릭한 페이지까지 전부 선택
+      const start = Math.min(anchor, pageIndex);
+      const end = Math.max(anchor, pageIndex);
+      for (let i = start; i <= end; i++) {
+        selectedSet.add(i);
+      }
     } else {
-      // 선택되지 않았으면 추가
-      selectedIndices.push(pageIndex);
+      // 일반 클릭: 토글
+      if (selectedSet.has(pageIndex)) {
+        selectedSet.delete(pageIndex);
+      } else {
+        selectedSet.add(pageIndex);
+      }
+      lastClickedPageIndexRef.current = pageIndex;
     }
 
-    currentFile.currentSelectedIndices = selectedIndices.sort((a, b) => a - b);
+    currentFile.currentSelectedIndices = Array.from(selectedSet).sort((a, b) => a - b);
     updatedFiles[currentFileIndex] = currentFile;
     setFiles(updatedFiles);
   };
