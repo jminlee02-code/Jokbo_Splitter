@@ -217,7 +217,7 @@ function App() {
                 type="text"
                 value={fileName}
                 onChange={(e) => handleFileNameChange(e.target.value)}
-                placeholder="예: 최종_인급문_2024"
+                placeholder="예: 최종_인급문_2026"
                 className={`w-full px-4 py-3 rounded-2xl border-2 focus:outline-none transition-colors text-gray-900 ${
                   validationErrors.some((e) => e.includes('파일명'))
                     ? 'border-red-500 focus:border-red-500'
