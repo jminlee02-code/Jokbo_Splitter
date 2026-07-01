@@ -63,19 +63,18 @@ function App() {
     const validation = validateForm(files, fileName, extractionOptions);
 
     if (!validation.isValid) {
-      setValidationErrors(validation.errors);
-      // 각 에러를 Toast로 표시 (사용자 안내는 덜 공격적인 아이콘 사용)
-      validation.errors.forEach((error) => {
-        toast.error(error, {
-          style: {
-            background: '#fff',
-            color: '#333',
-            borderRadius: '12px',
-            padding: '12px 16px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          },
-          icon: '💡', // 사용자 안내는 전구 이모지 사용
-        });
+      // 위에서부터 가장 먼저 걸리는 오류 하나만 표시한다 (파일명 → 업로드 → 섹션 순).
+      const firstError = validation.errors[0];
+      setValidationErrors([firstError]);
+      toast.error(firstError, {
+        style: {
+          background: '#fff',
+          color: '#333',
+          borderRadius: '12px',
+          padding: '12px 16px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        },
+        icon: '💡',
       });
       return;
     }
