@@ -224,30 +224,30 @@ export default function SortableFileList({
    *     교수님 성함으로 추정한다 (수업명 다음에 교수님이 오는 구조는 항상 유지되는 편).
    */
   const getProfessorFromFileName = (fileName: string): string => {
-    const withoutExt = fileName.replace(/\.[a-zA-Z0-9]{1,5}$/, '');
-    const parts = withoutExt
-      .split('_')
-      .map((p) => p.trim())
-      .filter((p) => p.length > 0);
+    // macOS HFS+/APFS는 파일명 한글을 NFD(자모 분리)로 저장한다.
+    // 브라우저가 File.name을 NFD 그대로 전달하면 NFC 리터럴과 매칭이 실패하므로 먼저 정규화.
+    const name = fileName.normalize('NFC');
 
+    // 파일명 전체에서 "[2-5글자 한글이름] 교수님" 패턴을 직접 검색 (가장 확실한 신호).
+    const m = name.match(/([가-힣]{2,5})\s*교수님/);
+    if (m) return m[1];
+
+    // "교수님" 없이 "교수" 포함 세그먼트로 fallback
+    const withoutExt = name.replace(/\.[a-zA-Z0-9]{1,5}$/, '');
+    const parts = withoutExt.split('_').map((p) => p.trim()).filter((p) => p.length > 0);
     const profSegment = parts.find((p) => p.includes('교수'));
-    if (profSegment) {
-      return profSegment.replace(/교수님?$/, '').trim();
-    }
+    if (profSegment) return profSegment.replace(/\s*교수님?$/, '').trim();
 
+    // 날짜/교시 외 세그먼트 중 가장 긴 것(수업명) 바로 다음을 교수님으로 추정
     const isDateLike = (s: string) => /^\d{6,8}$/.test(s);
     const isPeriodLike = (s: string) => /\d+\s*교시/.test(s);
     const meaningfulParts = parts.filter((p) => !isDateLike(p) && !isPeriodLike(p));
-
     if (meaningfulParts.length === 0) return '';
 
     let longestIndex = 0;
     for (let i = 1; i < meaningfulParts.length; i++) {
-      if (meaningfulParts[i].length > meaningfulParts[longestIndex].length) {
-        longestIndex = i;
-      }
+      if (meaningfulParts[i].length > meaningfulParts[longestIndex].length) longestIndex = i;
     }
-
     const next = meaningfulParts[longestIndex + 1];
     return (next ?? meaningfulParts[meaningfulParts.length - 1]).trim();
   };
@@ -268,7 +268,8 @@ export default function SortableFileList({
     const sortedFiles = [...files].sort((a, b) => {
       const profA = getProfessorFromFileName(a.name);
       const profB = getProfessorFromFileName(b.name);
-      const primary = profA.localeCompare(profB, 'ko', { sensitivity: 'base' });
+      // Hangul 음절(U+AC00-D7A3)은 코드 포인트 순서 = 가나다 순이므로 단순 비교로 충분하다.
+      const primary = profA < profB ? -1 : profA > profB ? 1 : 0;
       if (primary !== 0) return primary;
 
       // 같은 교수님일 경우, 날짜 -> 교시 순으로 정렬해 같은 교수님 강의들이 올바른 순서로 묶이게 한다.
